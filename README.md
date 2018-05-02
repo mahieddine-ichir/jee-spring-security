@@ -174,6 +174,8 @@ api `@Path` in _Endpoint.class_ and _PrivateEndpoint_ classes :
  that do not correspond to physical users, but rather to systems (system 2 system calls). In OAuth2, these users
  correspond to _clients_ that have obtained there token using the _Client Credentials_ flow.
  
+The access strategy (role vs access points/url patterns) is configured in _WebSecurityConfig_ class (or in the _my-security.xml_ file).
+
 ## Tests
 The application _hard code_ checks (in _MyUserDetailsService_) for 3 user logins 
 
@@ -185,6 +187,8 @@ Once deployed, you can test the different endpoints and the security config, exe
 _(assumed the application is accessible on localhost:8080)_
 
 **User resources API access**
+
+Calling 
 ```
     mytoken=`echo user:user | base64` && curl -vX GET localhost:8080/myapi/ -H "Authorization: Token $mytoken"
 ```
@@ -195,17 +199,32 @@ you should get a 200 code response.
 ```
 you should get a 200 code response too.
 
+However calling
 ```
     mytoken=`echo app:app | base64` && curl -vX GET localhost:8080/myapi/ -H "Authorization: Token $mytoken"
 ```
-* you should get a 403 code response.
+you should get a 403 code response.
 
 
 **Application API access**
+
+Calling 
 ```
-    curl -vX GET http://localhost:8080/myapi/  -H "Authorization: Token YXBwOmFwcAo="
+    mytoken=`echo app:app | base64` && curl -vX GET localhost:8080/myapi/ -H "Authorization: Token $mytoken"
 ```
-hint: base64.encode(app:app) = "YXBwOmFwcAo="
+you should get a 200 code response.
+
+```
+    mytoken=`echo mixed:mixed | base64` && curl -vX GET localhost:8080/myapi/ -H "Authorization: Token $mytoken"
+```
+you should get a 200 code response too.
+
+However calling
+```
+    mytoken=`echo user:user | base64` && curl -vX GET localhost:8080/myapi/ -H "Authorization: Token $mytoken"
+```
+you should get a 403 code response.
+
 
 ### Context
 
